@@ -1,36 +1,30 @@
 {
-  "name": "html-webpack-inline-source-plugin",
-  "version": "1.0.0-beta.2",
-  "description": "Embed javascript and css source inline when using the webpack dev server or middleware",
+  "name": "html-webpack-inline-lzma-plugin",
+  "version": "0.0.1",
+  "description": "Embed javascript and css source as inline lzma base64 when using the webpack dev server or middleware",
   "main": "index.js",
-  "types": "index.d.ts",
   "files": [
-    "index.js",
-    "index.d.ts"
+    "index.js"
   ],
-  "scripts": {
-    "prepublish": "npm run test",
-    "pretest": "semistandard",
-    "test": "jasmine",
-    "debug": "node-debug jasmine"
-  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dustinjackson/html-webpack-inline-source-plugin.git"
+    "url": "https://github.com/PowerfulPony/html-webpack-inline-lzma-plugin.git"
   },
   "keywords": [
     "webpack",
     "plugin",
     "html-webpack-plugin",
     "inline",
-    "source"
+    "source",
+    "lzma",
+    "base64"
   ],
-  "author": "Dustin Jackson <dustin.jackson@live.com> (https://github.com/DustinJackson)",
+  "author": "Victor Zakharenko <victor@pony.ninja>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dustinjackson/html-webpack-inline-source-plugin/issues"
+    "url": "https://github.com/PowerfulPony/html-webpack-inline-lzma-plugin/issues"
   },
-  "homepage": "https://github.com/dustinjackson/html-webpack-inline-source-plugin",
+  "homepage": "https://github.com/PowerfulPony/html-webpack-inline-lzma-plugin",
   "devDependencies": {
     "cheerio": "^0.22.0",
     "css-loader": "^0.25.0",
@@ -44,6 +38,7 @@
   },
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
+    "lzma-native": "^6.0.0",
     "slash": "^1.0.0",
     "source-map-url": "^0.4.0"
   }
