@@ -1,4 +1,4 @@
-Inline Source extension for the HTML Webpack Plugin
+Inline Source as LZMA extension for the HTML Webpack Plugin
 ========================================
 
 Enhances [html-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin)
@@ -12,7 +12,7 @@ You must be running webpack on node 4 or higher
 
 Install the plugin with npm:
 ```shell
-$ npm install --save-dev html-webpack-inline-source-plugin
+$ npm install --save-dev html-webpack-inline-lzma-plugin
 ```
 
 Basic Usage
@@ -20,7 +20,7 @@ Basic Usage
 Require the plugin in your webpack config:
 
 ```javascript
-var HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+var HtmlWebpackInlineLzmaPlugin = require('html-webpack-inline-lzma-plugin');
 ```
 
 Add the plugin to your webpack config as follows:
@@ -28,7 +28,7 @@ Add the plugin to your webpack config as follows:
 ```javascript
 plugins: [
   new HtmlWebpackPlugin(),
-  new HtmlWebpackInlineSourcePlugin()
+  new HtmlWebpackInlineLzmaPlugin()
 ]  
 ```
 The above configuration will actually do nothing due to the configuration defaults.
@@ -39,17 +39,6 @@ plugins: [
   new HtmlWebpackPlugin({
 		inlineSource: '.(js|css)$' // embed all javascript and css inline
 	}),
-  new HtmlWebpackInlineSourcePlugin()
+  new HtmlWebpackInlineLzmaPlugin()
 ]  
 ```
-
-Sourcemaps
-----------
-If any source files contain a sourceMappingURL directive that isn't a data URI, then the sourcemap URL is corrected to be relative to the domain root (unless it already is) instead of to the original source file.
-
-All sourcemap comment styles are supported:
-
-* `//# ...`
-* `//@ ...`
-* `/*# ...*/`
-* `/*@ ...*/`

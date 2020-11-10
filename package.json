@@ -1,7 +1,8 @@
 {
   "name": "html-webpack-inline-lzma-plugin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Embed javascript and css source as inline lzma base64 when using the webpack dev server or middleware",
+  "type": "commonjs",
   "main": "index.js",
   "files": [
     "index.js",
@@ -27,21 +28,23 @@
     "url": "https://github.com/PowerfulPony/html-webpack-inline-lzma-plugin/issues"
   },
   "homepage": "https://github.com/PowerfulPony/html-webpack-inline-lzma-plugin",
+  "scripts": {
+    "lint": "eslint ./index.js"
+  },
+  "peerDependencies": {
+    "html-webpack-plugin": ">=3.2"
+  },
   "devDependencies": {
-    "cheerio": "^0.22.0",
-    "css-loader": "^0.25.0",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "html-webpack-plugin": "^4.5.0",
-    "jasmine": "^2.4.1",
-    "rimraf": "^2.5.2",
-    "semistandard": "^7.0.5",
-    "style-loader": "^0.13.1",
-    "webpack": "^4.20.2"
+    "eslint": "^7.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-sonarjs": "^0.5.0"
   },
   "dependencies": {
-    "escape-string-regexp": "^1.0.5",
-    "lzma-native": "^6.0.0",
-    "slash": "^1.0.0",
-    "source-map-url": "^0.4.0"
+    "escape-string-regexp": "~1.0",
+    "lzma-native": "~6.0",
+    "slash": "~1.0",
+    "source-map-url": "~0.4"
   }
 }
