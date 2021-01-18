@@ -49,7 +49,7 @@ function lzma2str(base64) {
   LZMA.decompressFile(input, output);
 
   var outputArray = output.qt[0];
-  newOutput = Utf8ArrayToStr(outputArray);
+  var newOutput = Utf8ArrayToStr(outputArray);
 
   return newOutput;
 }
