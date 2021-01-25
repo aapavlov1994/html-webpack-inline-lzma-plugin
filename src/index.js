@@ -7,8 +7,8 @@ const lzma = require('lzma-native');
 // eslint-disable-next-line import/no-unresolved
 const htmlWebpackPlugin = require('html-webpack-plugin');
 
-const lzmaStr = fs.readFileSync(path.resolve(__dirname, 'lzma.min.js'));
-const isrtStr = fs.readFileSync(path.resolve(__dirname, 'inserter.min.js'));
+const lzmaStr = fs.readFileSync(path.resolve(__dirname, '../dist/lzma.min.js'));
+const isrtStr = fs.readFileSync(path.resolve(__dirname, '../dist/inserter.min.js'));
 
 function HtmlWebpackInlineSourcePlugin() {
   this.htmlWebpackPlugin = htmlWebpackPlugin;
