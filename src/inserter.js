@@ -1,17 +1,17 @@
-// eslint-disable-next-line
+/* eslint-disable */
 // npx terser inserter.js --compress --safari10 --ecma 6 --mangle-props reserved=[tagz,iStream,oStream,decompressFile,qt] --output ../dist/inserter.min.js
-function utf8ArrayToStr(array) {
-  let c;
-  let char2;
-  let char3;
-  let i = 0;
-  let out = '';
-  const l = array.length;
+function Utf8ArrayToStr(array) {
+  var out, i, len, c;
+  var char2, char3;
 
-  while (i < l) {
+  out = '';
+  len = array.length;
+  i = 0;
+
+  while(i < len) {
     c = array[i++];
-    // eslint-disable-next-line default-case
-    switch (c >> 4) {
+    switch(c >> 4)
+    { 
       case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
         // 0xxxxxxx
         out += String.fromCharCode(c);
@@ -26,8 +26,8 @@ function utf8ArrayToStr(array) {
         char2 = array[i++];
         char3 = array[i++];
         out += String.fromCharCode(((c & 0x0F) << 12)
-          | ((char2 & 0x3F) << 6)
-          | ((char3 & 0x3F) << 0));
+        | ((char2 & 0x3F) << 6)
+        | ((char3 & 0x3F) << 0));
         break;
     }
   }
@@ -36,29 +36,31 @@ function utf8ArrayToStr(array) {
 }
 
 function lzma2str(base64) {
-  const raw = window.atob(base64);
-  const rawLength = raw.length;
-  const array = new Uint8Array(new ArrayBuffer(rawLength));
+  var raw = window.atob(base64);
+  var rawLength = raw.length;
+  var array = new Uint8Array(new ArrayBuffer(rawLength));
 
-  for (let i = 0; i < rawLength; i++) {
+  for(i = 0; i < rawLength; i++) {
     array[i] = raw.charCodeAt(i);
   }
 
-  const input = new LZMA.iStream(array);
-  const output = new LZMA.oStream();
+  var input = new LZMA.iStream(array);
+  var output = new LZMA.oStream();
   LZMA.decompressFile(input, output);
 
-  const outputArray = output.qt[0];
-  return utf8ArrayToStr(outputArray);
+  var outputArray = output.qt[0];
+  newOutput = Utf8ArrayToStr(outputArray);
+
+  return newOutput;
 }
 
 function createTag(meta) {
-  const type = meta[0] === 'j' ? 'script' : 'style';
-  const lzma = meta[1];
+  var type = meta[0] === 'j' ? 'script' : 'style';
+  var lzma = meta[1];
 
-  const str = lzma2str(lzma);
+  var str = lzma2str(lzma);
 
-  const $tag = document.createElement(type);
+  var $tag = document.createElement(type);
   if (type === 'style') {
     $tag.type = 'text/css';
     $tag.innerHTML = str;
@@ -71,4 +73,5 @@ function createTag(meta) {
   }
 }
 
-tagz.forEach((tag) => createTag(tag));
+tagz.forEach(tag => createTag(tag));
+/* eslint-enable */

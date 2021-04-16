@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-inline-lzma-plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Embed javascript and css source as inline lzma base64 when using the webpack dev server or middleware",
   "type": "commonjs",
   "main": "src/index.js",
