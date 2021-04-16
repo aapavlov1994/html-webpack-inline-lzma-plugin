@@ -1,17 +1,17 @@
-/* eslint-disable */
-// npx terser inserter.js --compress --safari10 --ecma 6 --mangle-props reserved=[tagz,iStream,oStream,decompressFile,qt] --output ../dist/inserter.min.js
-function Utf8ArrayToStr(array) {
-  var out, i, len, c;
-  var char2, char3;
+// eslint-disable-next-line
+// npx terser inserter.js --compress --safari10 --ecma 6 --mangle-props reserved=[tagz,iStream,oStream,buffers,size,decompressFile] --output ../dist/inserter.min.js
+function utf8ArrayToStr(array) {
+  let c;
+  let char2;
+  let char3;
+  let i = 0;
+  let out = '';
+  const l = array.length;
 
-  out = '';
-  len = array.length;
-  i = 0;
-
-  while(i < len) {
+  while (i < l) {
     c = array[i++];
-    switch(c >> 4)
-    { 
+    // eslint-disable-next-line default-case
+    switch (c >> 4) {
       case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
         // 0xxxxxxx
         out += String.fromCharCode(c);
@@ -26,8 +26,8 @@ function Utf8ArrayToStr(array) {
         char2 = array[i++];
         char3 = array[i++];
         out += String.fromCharCode(((c & 0x0F) << 12)
-        | ((char2 & 0x3F) << 6)
-        | ((char3 & 0x3F) << 0));
+          | ((char2 & 0x3F) << 6)
+          | ((char3 & 0x3F) << 0));
         break;
     }
   }
@@ -36,31 +36,29 @@ function Utf8ArrayToStr(array) {
 }
 
 function lzma2str(base64) {
-  var raw = window.atob(base64);
-  var rawLength = raw.length;
-  var array = new Uint8Array(new ArrayBuffer(rawLength));
+  const raw = window.atob(base64);
+  const rawLength = raw.length;
+  const array = new Uint8Array(new ArrayBuffer(rawLength));
 
-  for(i = 0; i < rawLength; i++) {
+  for (let i = 0; i < rawLength; i++) {
     array[i] = raw.charCodeAt(i);
   }
 
-  var input = new LZMA.iStream(array);
-  var output = new LZMA.oStream();
+  const input = new LZMA.iStream(array);
+  const output = new LZMA.oStream();
   LZMA.decompressFile(input, output);
 
-  var outputArray = output.qt[0];
-  newOutput = Utf8ArrayToStr(outputArray);
-
-  return newOutput;
+  const outputArray = output.buffers[0];
+  return utf8ArrayToStr(outputArray);
 }
 
 function createTag(meta) {
-  var type = meta[0] === 'j' ? 'script' : 'style';
-  var lzma = meta[1];
+  const type = meta[0] === 'j' ? 'script' : 'style';
+  const lzma = meta[1];
 
-  var str = lzma2str(lzma);
+  const str = lzma2str(lzma);
 
-  var $tag = document.createElement(type);
+  const $tag = document.createElement(type);
   if (type === 'style') {
     $tag.type = 'text/css';
     $tag.innerHTML = str;
@@ -73,5 +71,4 @@ function createTag(meta) {
   }
 }
 
-tagz.forEach(tag => createTag(tag));
-/* eslint-enable */
+tagz.forEach((tag) => createTag(tag));

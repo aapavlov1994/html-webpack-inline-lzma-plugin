@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-inline-lzma-plugin",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Embed javascript and css source as inline lzma base64 when using the webpack dev server or middleware",
   "type": "commonjs",
   "main": "src/index.js",
@@ -30,8 +30,8 @@
   "homepage": "https://github.com/PowerfulPony/html-webpack-inline-lzma-plugin",
   "scripts": {
     "lint": "eslint ./src/*.js",
-    "min:lzma": "npx terser ./vendor/lzma.js --compress --safari10 --ecma 6 --mangle-props reserved=[iStream,oStream,decompressFile] --output ./dist/lzma.min.js",
-    "min:inserter": "npx terser ./src/inserter.js --compress --safari10 --ecma 6 --mangle-props reserved=[tagz,iStream,oStream,decompressFile,qt] --output ./dist/inserter.min.js",
+    "min:lzma": "npx terser ./vendor/lzma.js --compress --safari10 --ecma 6 --mangle-props reserved=[iStream,oStream,buffers,size,decompressFile] --output ./dist/lzma.min.js",
+    "min:inserter": "npx terser ./src/inserter.js --compress --safari10 --ecma 6 --mangle-props reserved=[tagz,iStream,oStream,buffers,size,decompressFile] --output ./dist/inserter.min.js",
     "min": "npm run min:lzma && npm run min:inserter"
   },
   "peerDependencies": {

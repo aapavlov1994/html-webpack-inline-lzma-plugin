@@ -1,4 +1,4 @@
-// npx terser lzma.js --compress --safari10 --ecma 6 --mangle-props reserved=[iStream,oStream,decompressFile] --output ../dist/lzma.min.js
+// npx terser lzma.js --compress --safari10 --ecma 6 --mangle-props reserved=[iStream,oStream,buffers,size,decompressFile] --output ../dist/lzma.min.js
 
 /*
 Copyright (c) 2011 Juan Mellado

@@ -1,128 +1,134 @@
-'use strict';
-var fs = require('fs');
-var path = require('path');
-var assert = require('assert');
-var escapeRegex = require('escape-string-regexp');
-var path = require('path');
-var slash = require('slash');
-var sourceMapUrl = require('source-map-url');
-var lzma = require('lzma-native');
+const fs = require('fs');
+const path = require('path');
+const escapeRegex = require('escape-string-regexp');
+const slash = require('slash');
+const sourceMapUrl = require('source-map-url');
+const lzma = require('lzma-native');
+// eslint-disable-next-line import/no-unresolved
+const htmlWebpackPlugin = require('html-webpack-plugin');
 
-var pluginName = 'html-webpack-inline-source-plugin';
+const lzmaStr = fs.readFileSync(path.resolve(__dirname, '../dist/lzma.min.js'));
+const isrtStr = fs.readFileSync(path.resolve(__dirname, '../dist/inserter.min.js'));
 
-var lzmaStr = fs.readFileSync(path.resolve(__dirname, '../dist/lzma.min.js'));
-var isrtStr = fs.readFileSync(path.resolve(__dirname, '../dist/inserter.min.js'));
-
-function HtmlWebpackInlineSourcePlugin (options) {
-  assert.equal(options, undefined, 'The HtmlWebpackInlineSourcePlugin does not accept any options');
+function HtmlWebpackInlineSourcePlugin() {
+  this.htmlWebpackPlugin = htmlWebpackPlugin;
 }
 
-HtmlWebpackInlineSourcePlugin.prototype.apply = function (compiler) {
-  var self = this;
+HtmlWebpackInlineSourcePlugin.prototype.apply = function apply(compiler) {
+  const self = this;
 
   // Hook into the html-webpack-plugin processing
+  compiler.hooks.compilation.tap('html-webpack-inline-source-plugin', (compilation) => {
+    self.htmlWebpackPlugin
+      .getHooks(compilation)
+      .alterAssetTagGroups.tapAsync('html-webpack-inline-source-plugin', (htmlPluginData, callback) => {
+        if (!htmlPluginData.plugin.options.inlineSource) return callback(null, htmlPluginData);
 
-  (compiler.hooks
-    ? compiler.hooks.compilation.tap.bind(compiler.hooks.compilation, pluginName)
-    : compiler.plugin.bind(compiler, 'compilation'))(function (compilation) {
-      (compilation.hooks
-      ? compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync.bind(compilation.hooks.htmlWebpackPluginAlterAssetTags, pluginName)
-      : compilation.plugin.bind(compilation, 'html-webpack-plugin-alter-asset-tags'))(function (htmlPluginData, callback) {
-        if (!htmlPluginData.plugin.options.inlineSource) {
-          return callback(null, htmlPluginData);
-        }
+        const regexStr = htmlPluginData.plugin.options.inlineSource;
 
-        var regexStr = htmlPluginData.plugin.options.inlineSource;
-
-        var result = self.processTags(compilation, regexStr, htmlPluginData)
-          .then(function(result) {
+        return self.processTags(compilation, regexStr, htmlPluginData)
+          .then((result) => {
             callback(null, result);
           });
       });
-    });
+  });
 };
 
-HtmlWebpackInlineSourcePlugin.prototype.processTags = function (compilation, regexStr, pluginData) {
-  var self = this;
-  var regex = new RegExp(regexStr);
+HtmlWebpackInlineSourcePlugin.prototype.processTags = function processTags(
+  compilation,
+  regexStr,
+  pluginData,
+) {
+  const self = this;
+  const regex = new RegExp(regexStr);
 
-  return new Promise(function(resolve) {
-    var promises = [];
+  return new Promise((resolve) => {
+    const promises = [];
 
-    pluginData.head.forEach(function (tag) {
+    pluginData.headTags.forEach((tag) => {
       promises.push(self.processTag(compilation, regex, tag));
     });
 
-    pluginData.body.forEach(function (tag) {
+    pluginData.bodyTags.forEach((tag) => {
       promises.push(self.processTag(compilation, regex, tag));
     });
 
+    const type = 'text/javascript';
     promises.push(self.processTag(compilation, regex, {
       tagName: 'script',
       closeTag: true,
-      attributes: {
-        type: 'text/javascript'
-      },
-      innerHTML: lzmaStr
+      attributes: { type },
+      innerHTML: lzmaStr,
     }));
 
     promises.push(self.processTag(compilation, regex, {
       tagName: 'script',
       closeTag: true,
-      attributes: {
-        type: 'text/javascript'
-      },
-      innerHTML: isrtStr
+      attributes: { type },
+      innerHTML: isrtStr,
     }));
 
-    Promise.all(promises).then(function(tags) {
-      resolve({ head: [], body: tags, plugin: pluginData.plugin, chunks: pluginData.chunks, outputName: pluginData.outputName });
-    })
-  })
+    Promise.all(promises).then((tags) => {
+      resolve({
+        headTags: [],
+        bodyTags: tags,
+        plugin: pluginData.plugin,
+        chunks: pluginData.chunks,
+        outputName: pluginData.outputName,
+      });
+    });
+  });
 };
 
-HtmlWebpackInlineSourcePlugin.prototype.resolveSourceMaps = function (compilation, assetName, asset) {
-  var source = asset.source();
-  var out = compilation.outputOptions;
+HtmlWebpackInlineSourcePlugin.prototype.resolveSourceMaps = function resolveSourceMaps(
+  compilation,
+  assetName,
+  asset,
+) {
+  let source = asset.source();
+  const out = compilation.outputOptions;
   // Get asset file absolute path
-  var assetPath = path.join(out.path, assetName);
+  const assetPath = path.join(out.path, assetName);
   // Extract original sourcemap URL from source string
   if (typeof source !== 'string') {
     source = source.toString();
   }
-  var mapUrlOriginal = sourceMapUrl.getFrom(source);
+  const mapUrlOriginal = sourceMapUrl.getFrom(source);
   // Return unmodified source if map is unspecified, URL-encoded, or already relative to site root
   if (!mapUrlOriginal || mapUrlOriginal.indexOf('data:') === 0 || mapUrlOriginal.indexOf('/') === 0) {
     return source;
   }
   // Figure out sourcemap file path *relative to the asset file path*
-  var assetDir = path.dirname(assetPath);
-  var mapPath = path.join(assetDir, mapUrlOriginal);
-  var mapPathRelative = path.relative(out.path, mapPath);
+  const assetDir = path.dirname(assetPath);
+  const mapPath = path.join(assetDir, mapUrlOriginal);
+  const mapPathRelative = path.relative(out.path, mapPath);
   // Starting with Node 6, `path` module throws on `undefined`
-  var publicPath = out.publicPath || '';
+  const publicPath = out.publicPath || '';
   // Prepend Webpack public URL path to source map relative path
   // Calling `slash` converts Windows backslashes to forward slashes
-  var mapUrlCorrected = slash(path.join(publicPath, mapPathRelative));
+  const mapUrlCorrected = slash(path.join(publicPath, mapPathRelative));
   // Regex: exact original sourcemap URL, possibly '*/' (for CSS), then EOF, ignoring whitespace
-  var regex = new RegExp(escapeRegex(mapUrlOriginal) + '(\\s*(?:\\*/)?\\s*$)');
+  const regex = new RegExp(`${escapeRegex(mapUrlOriginal)}(\\s*(?:\\*/)?\\s*$)`);
   // Replace sourcemap URL and (if necessary) preserve closing '*/' and whitespace
-  return source.replace(regex, function (match, group) {
-    return mapUrlCorrected + group;
-  });
+  return source.replace(regex, (match, group) => mapUrlCorrected + group);
 };
 
-HtmlWebpackInlineSourcePlugin.prototype.processTag = function (compilation, regex, tag) {
-  var self = this;
+HtmlWebpackInlineSourcePlugin.prototype.processTag = function processTag(
+  compilation,
+  regex,
+  tag,
+) {
+  const self = this;
+  const preTag = tag;
 
-  return new Promise(function(resolve) {
-    var assetUrl;
-    var $tag = {
+  return new Promise((resolve) => {
+    let assetUrl;
+    const $tag = {
       tagName: 'script',
       closeTag: true,
       attributes: {
-        type: 'text/javascript'
-      }
+        type: 'text/javascript',
+      },
     };
 
     // inline js
@@ -136,19 +142,22 @@ HtmlWebpackInlineSourcePlugin.prototype.processTag = function (compilation, rege
 
     if (assetUrl) {
       // Strip public URL prefix from asset URL to get Webpack asset name
-      var publicUrlPrefix = compilation.outputOptions.publicPath || '';
-      var assetName = path.posix.relative(publicUrlPrefix, assetUrl);
-      var asset = compilation.assets[assetName];
-      var updatedSource = self.resolveSourceMaps(compilation, assetName, asset);
-      lzma.LZMA().compress(updatedSource, 9, function(result) {
-        $tag.innerHTML = 'var tagz=tagz||[];tagz.push(["'+ (tag.tagName === 'script' ? 'j' : 's') +'",'+ JSON.stringify(result.toString('base64')) +'])';
-        resolve($tag);
-      })
+      const publicUrlPrefix = compilation.outputOptions.publicPath || '';
+      const assetName = path.posix.relative(publicUrlPrefix, assetUrl);
+      const asset = compilation.assets[assetName];
+      if (compilation.assets[assetName] !== undefined) {
+        const updatedSource = self.resolveSourceMaps(compilation, assetName, asset);
+        lzma.LZMA().compress(updatedSource, 9, (result) => {
+          $tag.innerHTML = `var tagz=tagz||[];tagz.push(["${tag.tagName === 'script' ? 'j' : 's'}",${JSON.stringify(result.toString('base64'))}])`;
+          resolve($tag);
+        });
+      } else {
+        resolve(preTag);
+      }
     } else {
       resolve(tag);
     }
   });
-
 };
 
 module.exports = HtmlWebpackInlineSourcePlugin;
