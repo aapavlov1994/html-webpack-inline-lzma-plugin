@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "escape-string-regexp": "~4.0",
-    "lzma-native": "6.0.1",
+    "lzma-native": "^8.0.1",
     "slash": "~3.0",
     "source-map-url": "~0.4"
   }
